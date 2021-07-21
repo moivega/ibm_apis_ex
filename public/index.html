@@ -20,30 +20,89 @@
         <p>Esto es un ejemplo de como usar el servicio de <strong >TextToSpeech de IBM </strong> en un servicio.</p>
         <div class="row mb-3">
             <div class="col-md-8 themed-grid-col">
-                <form id="formTextToSpeech">
-                    <div class="form-group">
+                <div id="formTextToSpeech">
+                    <!-- <div class="form-group">
                       <label for="formLabelVoces">Voz</label>
                       <select class="form-control" id="formSelectVoces" name="voice"></select>
                     </div>
-                    <input id="formHiddenAccept" name="accept" type="hidden" value="audio/mp3">
-                    <div class="form-group">
-                      <label for="formLabelTexto">Texto a Convertir</label>
-                      <textarea class="form-control" id="formTextareaTexto" name="text" rows="3"></textarea>
-                    </div>
-                    <div class="form-group ">
+                    <input id="formHiddenAccept" name="accept" type="hidden" value="audio/mp3"> -->
+
+                    <form id="formTextToConvert">
+                      <div class="form-group">
+                        <label for="formLabelTexto">Introduzca Texto a Convertir - Preferiblemente en Español</label>
+                        <textarea class="form-control" id="formTextareaTexto" name="text" rows="3"></textarea>
+                      </div>
+                      <div class="form-group">
+                        <label for="formLabelVoces">Estilo de Voz</label>
+                        <select class="form-control" id="formSelectVoces" name="voice"></select>
+                      </div>
+                      <input id="formHiddenAccept" name="accept" type="hidden" value="audio/mp3">
+                      <div class="form-group ">
                         <div class="col-sm-10">
                           <button type="submit" class="btn btn-primary">Sintetizar</button>
                         </div>
-                    </div>
+                      </div>
+                    </form>
 
-                  </form>
-            </div>
-            <div class="col-md-4 themed-grid-col">
-                <div class="media">
-                    <audio controls id="playerTextVoz" type="audio/mpeg">
-                    </audio>
+                    <form id="formTextToTranslate">
+                      <div class="form-group">
+                        <label for="formLabelTextoATraducir">Introduzca Texto a Traducir</label>
+                        <textarea class="form-control" id="formTextareaTextoTraducir" name="text" rows="3"></textarea>
+                      </div> 
+                      <div class="form-group">
+                        <label for="formLabelLang">Lista de Idiomas Resultantes de la Traducción</label>
+                        <select class="form-control" id="formSelectLang" name="lang"></select>
+                      </div>
+                      <!-- <input type="hidden" id="formHiddenAcceptTwo" name="ac" value="texto/txt"><br><br>-->
+                      <!-- <input id="formHiddenAcceptTwo" name="ac" type="hidden" value="audio/mp3"> -->
+                      <div class="form-group ">
+                        <div class="col-sm-10">
+                          <button type="submit" class="btn btn-primary">Traducir</button>
+                        </div>
+                      </div>
+                      
+                    </form>
+            
+                    <!--
+                    <script>
+                      var txtForm = document.getElementById("formTextareaTexto");
+                      document.getElementById("formTextareaTextoTraducido") = txtForm;
+                    </script> 
+                    <div class="form-group">
+                      <label for="formLabelTextoTraducido">Texto Traducido</label>
+                      <textarea class="form-control" id="formTextareaTextoTraducido" name="text" rows="3"></textarea>
+                    </div> -->
+
                   </div>
             </div>
+            
+
+            <div class="col-md-4 themed-grid-col">
+              <h5>Audio del Texto Sintetizado</h5>
+              <div class="media">
+                <audio controls id="playerTextVoz" type="audio/mpeg">
+                </audio>
+                </div>
+            </div>
+            
+            <!--
+            <div class="col-md-4 themed-grid-col">
+              <h5>Audio del Texto Traducido</h5>
+              <div class="media">
+                  <audio controls id="playerTextTranslateVoz" type="audio/mpeg">
+                  </audio>
+                </div>
+            </div>
+            -->
+
+            <div class="col-md-4 themed-grid-col" hidden>
+              <h5>Texto Traducido</h5>
+              <div>
+                  <textarea id="TextTranslate" name="textTranslate" rows="3"></textarea>
+                </div>
+            </div>
+            
+             
         </div>
     </div>
     <!-- Optional JavaScript; choose one of the two! -->
@@ -57,6 +116,36 @@
         (function() {
             // Obtener todas las voces que estan disponibles en el servicio.
             // luego las muestra todas y seleciona la voz de enrique por defecto.
+
+          $.getJSON("/api/translate")
+            .done(function( data ) {
+              $.each( data.languages, function( i, lang ) {
+                var optionHtml = lang.language != null ? "<option selected></option>" : "<option></option>";
+                $("#formSelectLang" ).append($(optionHtml).val(lang.language).html(lang.language_name));
+                
+                /**
+                if(optionHtml != null) {
+                  var txtForm = document.getElementById("formTextareaTexto");
+                  if (txtForm != null) {
+                    $.getJSON("/api/v3/translate")
+                     .done(function(data) {
+                      $.each( data.ltParams, function( i, lang ) {
+                        ltParams.text = txtForm;
+                        ltParams.source = optionHtml;
+                      });
+                     });
+                  
+
+                     
+                  }
+                }
+                **/
+
+
+              });
+            });
+
+
           $.getJSON("/api/voces")
             .done(function( data ) {
               $.each( data.voices, function( i, voice ) {
@@ -66,7 +155,18 @@
             });
         
             // Enviar el formulario.
-            $("#formTextToSpeech").on( "submit",function(e) {
+            /**
+            $("").on( "submit",function(e) {
+                e.preventDefault();
+                var formData = $(this).serialize();
+                var url = "/api/sintetizar?"+formData;
+                var player = $("#playerTextTranslateVoz");
+                player.attr("src",url);
+                player.trigger('load');
+            }); **/
+            
+
+            $("#formTextToConvert").on( "submit",function(e) {
                 e.preventDefault();
                 var formData = $(this).serialize();
                 var url = "/api/sintetizar?"+formData;
@@ -74,6 +174,31 @@
                 player.attr("src",url);
                 player.trigger('load');
             });
+            
+            
+            $("#formTextToTranslate").on( "submit",function(e) {
+                e.preventDefault();
+                // var txtForm = document.getElementById("formTextareaTexto");
+                // var formData = $(this).serialize(); // lang selected
+                var formData = JSON.stringify($("#formSelectLang").serializeArray());
+                // window.alert(txtForm);
+                // console.log(formData);
+                var url = "/api/v3/translate?"+formData;
+                var txtBox = $("#TextTranslate");
+                txtBox.attr("src",url);
+                txtBox.trigger('load'); 
+            });
+            
+            // ConsPrint
+            $.getJSON("/api/v3/translate")
+            .done(function( data ) {
+              $.each( data.trans, function( i, textTranslate ) {
+                var optionHtml = translated != null ? "<div selected></div>" : "<div></div>";
+                $("#TextTranslate" ).append($(optionHtml).val(translated).html(translated))
+              });
+            });
+            
+
 
         })();
     </script>

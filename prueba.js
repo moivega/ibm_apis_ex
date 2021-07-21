@@ -13,7 +13,7 @@ const textToSpeech = new TextToSpeechV1({
 
 // opciones de sintetizado
 const synthesizeParams = {
-    text: 'Hola!! esto es una prueba de texto a voz, intenta cambiar este texto por lo que gustes.',
+    text: 'Que tal Moises, bienvenido. Puedo traducir casi cualquier texto a voz.',
     accept: 'audio/mp3', // los diferentes formatos https://cloud.ibm.com/apidocs/text-to-speech#getsynthesize
     voice: 'es-ES_EnriqueV3Voice', // las diferentes voces https://cloud.ibm.com/apidocs/text-to-speech#getsynthesize
 };
